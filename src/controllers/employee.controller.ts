@@ -24,3 +24,14 @@ export const getAllEmployees = (req: Request, res: Response) => {
   const employees = db.prepare("SELECT * FROM employees").all();
   return res.status(200).json(employees);
 };
+
+export const getEmployeeById = (req: Request, res: Response) => {
+  const { id } = req.params;
+  const employee = db.prepare("SELECT * FROM employees WHERE id = ?").get(id);
+
+  if (!employee) {
+    return res.status(404).json({ error: "Employee not found" });
+  }
+
+  return res.status(200).json(employee);
+};
