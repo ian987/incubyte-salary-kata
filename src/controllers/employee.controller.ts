@@ -19,3 +19,8 @@ export const createEmployee = (req: Request, res: Response) => {
 
   return res.status(201).json(employee);
 };
+
+export const getAllEmployees = (req: Request, res: Response) => {
+  const employees = db.prepare("SELECT * FROM employees").all();
+  return res.status(200).json(employees);
+};
