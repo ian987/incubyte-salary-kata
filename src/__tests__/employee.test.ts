@@ -19,4 +19,11 @@ describe("Employee CRUD", () => {
     });
     expect(response.body.id).toBeDefined();
   });
+
+  it("GET /employees - returns list of all employees", async () => {
+    const response = await request(app).get("/employees");
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body)).toBe(true);
+  });
 });
