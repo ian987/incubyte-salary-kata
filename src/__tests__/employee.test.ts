@@ -51,4 +51,41 @@ describe("Employee CRUD", () => {
     const response = await request(app).get("/employees/99999");
     expect(response.status).toBe(404);
   });
+
+  it("PUT /employees/:id - updates an employee and returns 200", async () => {
+    const created = await request(app).post("/employees").send({
+      fullName: "Mark Smith",
+      jobTitle: "Manager",
+      country: "India",
+      salary: 120000,
+    });
+
+    const id = created.body.id;
+
+    const response = await request(app).put(`/employees/${id}`).send({
+      fullName: "Mark Smith Updated",
+      jobTitle: "Senior Manager",
+      country: "India",
+      salary: 150000,
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      fullName: "Mark Smith Updated",
+      jobTitle: "Senior Manager",
+      country: "India",
+      salary: 150000,
+    });
+  });
+
+  it("PUT /employees/:id - returns 404 if employee not found", async () => {
+    const response = await request(app).put("/employees/99999").send({
+      fullName: "Ghost",
+      jobTitle: "Nobody",
+      country: "India",
+      salary: 0,
+    });
+
+    expect(response.status).toBe(404);
+  });
 });
