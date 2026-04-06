@@ -88,4 +88,30 @@ describe("Employee CRUD", () => {
 
     expect(response.status).toBe(404);
   });
+
+  it("DELETE /employees/:id - deletes an employee and returns 200", async () => {
+    const created = await request(app).post("/employees").send({
+      fullName: "Tom Hardy",
+      jobTitle: "Analyst",
+      country: "India",
+      salary: 90000,
+    });
+
+    const id = created.body.id;
+
+    const response = await request(app).delete(`/employees/${id}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      message: "Employee deleted successfully",
+    });
+
+    const check = await request(app).get(`/employees/${id}`);
+    expect(check.status).toBe(404);
+  });
+
+  it("DELETE /employees/:id - returns 404 if employee not found", async () => {
+    const response = await request(app).delete("/employees/99999");
+    expect(response.status).toBe(404);
+  });
 });
