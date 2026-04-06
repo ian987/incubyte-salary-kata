@@ -6,6 +6,34 @@ import {
   countEmployeesByJobTitle,
 } from "../db/metrics.repository";
 
+const handleCountryMetrics = (country: string, res: Response) => {
+  if (countEmployeesByCountry(country) === 0) {
+    return res
+      .status(404)
+      .json({ error: `No employees found for country: ${country}` });
+  }
+  const metrics = getSalaryMetricsByCountry(country);
+  return res.status(200).json({
+    country,
+    min: metrics?.min,
+    max: metrics?.max,
+    average: metrics?.average,
+  });
+};
+
+const handleJobTitleMetrics = (jobTitle: string, res: Response) => {
+  if (countEmployeesByJobTitle(jobTitle) === 0) {
+    return res
+      .status(404)
+      .json({ error: `No employees found for job title: ${jobTitle}` });
+  }
+  const metrics = getAverageSalaryByJobTitle(jobTitle);
+  return res.status(200).json({
+    jobTitle,
+    average: metrics?.average,
+  });
+};
+
 export const getSalaryMetrics = (req: Request, res: Response) => {
   const { country, jobTitle } = req.query;
 
@@ -15,37 +43,6 @@ export const getSalaryMetrics = (req: Request, res: Response) => {
     });
   }
 
-  if (country) {
-    const countryStr = country as string;
-
-    if (countEmployeesByCountry(countryStr) === 0) {
-      return res.status(404).json({
-        error: `No employees found for country: ${countryStr}`,
-      });
-    }
-
-    const metrics = getSalaryMetricsByCountry(countryStr);
-    return res.status(200).json({
-      country: countryStr,
-      min: metrics?.min,
-      max: metrics?.max,
-      average: metrics?.average,
-    });
-  }
-
-  if (jobTitle) {
-    const jobTitleStr = jobTitle as string;
-
-    if (countEmployeesByJobTitle(jobTitleStr) === 0) {
-      return res.status(404).json({
-        error: `No employees found for job title: ${jobTitleStr}`,
-      });
-    }
-
-    const metrics = getAverageSalaryByJobTitle(jobTitleStr);
-    return res.status(200).json({
-      jobTitle: jobTitleStr,
-      average: metrics?.average,
-    });
-  }
+  if (country) return handleCountryMetrics(country as string, res);
+  if (jobTitle) return handleJobTitleMetrics(jobTitle as string, res);
 };
