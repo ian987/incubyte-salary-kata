@@ -35,3 +35,22 @@ export const getEmployeeById = (req: Request, res: Response) => {
 
   return res.status(200).json(employee);
 };
+
+export const updateEmployee = (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { fullName, jobTitle, country, salary } = req.body;
+
+  const existing = db.prepare("SELECT * FROM employees WHERE id = ?").get(id);
+
+  if (!existing) {
+    return res.status(404).json({ error: "Employee not found" });
+  }
+
+  db.prepare(
+    "UPDATE employees SET fullName = ?, jobTitle = ?, country = ?, salary = ? WHERE id = ?",
+  ).run(fullName, jobTitle, country, salary, id);
+
+  const updated = db.prepare("SELECT * FROM employees WHERE id = ?").get(id);
+
+  return res.status(200).json(updated);
+};
